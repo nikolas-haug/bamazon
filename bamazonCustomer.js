@@ -37,36 +37,76 @@ function showProducts() {
                 console.log(`Product ID: ${results[i].item_id} - ${results[i].product_name} || Price: $${results[i].price.toFixed(2)}\n`);
             }
         }
+        promptBuyer();
     });
-    promptBuyer();
 }
 
+//prompt user for product id and quantity input
 function promptBuyer() {
     connection.query("SELECT * FROM products", function(err, results) {
         if(err) throw err;
+    
         inquirer.prompt([
             {
                 name: "product_id",
-                type: "list",
-                pageSize: 100,
-                choices: function() {
-                    var productArray = [];
-                    for(var i = 0; i < results.length; i++) {
-                        productArray.push("Product: " + results[i].product_name + "    Product ID: " + results[i].item_id);
-                    }
-                    return productArray;
-                },
-                message: "Please input the product ID you wish to select."
-            },
-            {
-                name: "number_of_units",
-                type: "input",
-                message: "How many would you like to buy?"
+                message: "Please tell me the product id",
+                type: "input"
             },
         ]).then(function(answers) {
-            //check that the item is in stock
-            console.log(answers.product_id);
+            var chosenID;
+            for(var i = 0; i < results.length; i++) {
+                if(results[i].item_id === parseInt(answers.product_id)) {
+                    chosenID = results[i].item_id;
+                }
+            }
+            // console.log(answers.product_id);
+            //validate if user input is a number and an existing product id
+            if(isNaN(answers.product_id)) {
+                console.log("please enter a valid ID");
+                promptBuyer();
+            } else {
+                
+                
+                console.log("success!");
+                console.log(chosenID);
+            }
         });
     });
 }
+
+// function promptBuyer() {
+//     connection.query("SELECT * FROM products", function(err, results) {
+//         if(err) throw err;
+//         inquirer.prompt([
+//             {
+//                 name: "product_id",
+//                 type: "list",
+//                 pageSize: 100,
+//                 choices: function() {
+//                     var productArray = [];
+//                     for(var i = 0; i < results.length; i++) {
+//                         productArray.push("Product: " + results[i].product_name + "    Product ID: " + results[i].item_id);
+//                     }
+//                     return productArray;
+//                 },
+//                 message: "Please input the product ID you wish to select."
+//             },
+//             {
+//                 name: "number_of_units",
+//                 type: "input",
+//                 message: "How many would you like to buy?"
+//             },
+//         ]).then(function(answers) {
+//             //check that the item is in stock
+//             console.log(answers.product_id);
+//         });
+//     });
+// }
+
+// function validateNumber(num)
+// {
+//    var isValid = !_.isNaN(parseFloat(num));
+//    return isValid || "this should be a number!";
+// }
+
 

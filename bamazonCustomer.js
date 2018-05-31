@@ -50,6 +50,19 @@ function promptBuyer() {
             {
                 name: "product_id",
                 message: "Please tell me the product id",
+                type: "input",
+                //validate that input is a number
+                validate: function(value) {
+                    if (isNaN(value) === false) {
+                      return true;
+                    }
+                    return false;
+                    console.log("please enter a valid number")
+                }
+            },
+            {
+                name: "quantity",
+                message: "how many do you want?",
                 type: "input"
             },
         ]).then(function(answers) {
@@ -59,54 +72,33 @@ function promptBuyer() {
                     chosenID = results[i].item_id;
                 }
             }
-            // console.log(answers.product_id);
-            //validate if user input is a number and an existing product id
-            if(isNaN(answers.product_id)) {
-                console.log("please enter a valid ID");
-                promptBuyer();
-            } else {
-                
-                
-                console.log("success!");
-                console.log(chosenID);
-            }
+            connection.query("SELECT stock_quantity FROM products WHERE item_id= ?", 
+            [chosenID],
+            function(err, res) {
+                if(err) throw err;
+
+                if(answers.quantity > res[0].stock_quantity) {
+                    console.log("not enough in stock!");
+                    console.log("The current item stock is: " + res[0].stock_quantity);
+                    promptBuyer();
+                } else {
+                    // console.log("your order has been placed");
+                    connection.query("UPDATE products SET stock_quantity = ? WHERE item_id= ?",
+                    [
+                        res[0].stock_quantity - answers.quantity,
+                        chosenID
+                    ],
+                    function(err) {
+                        if(err) throw err;
+                        console.log("order placed!");
+                        connection.end();
+                    }                   
+                )   
+                }
+                // console.log(answers.quantity);
+                // console.log(res[0].stock_quantity);
+                // console.log(chosenID);
+            });
         });
     });
 }
-
-// function promptBuyer() {
-//     connection.query("SELECT * FROM products", function(err, results) {
-//         if(err) throw err;
-//         inquirer.prompt([
-//             {
-//                 name: "product_id",
-//                 type: "list",
-//                 pageSize: 100,
-//                 choices: function() {
-//                     var productArray = [];
-//                     for(var i = 0; i < results.length; i++) {
-//                         productArray.push("Product: " + results[i].product_name + "    Product ID: " + results[i].item_id);
-//                     }
-//                     return productArray;
-//                 },
-//                 message: "Please input the product ID you wish to select."
-//             },
-//             {
-//                 name: "number_of_units",
-//                 type: "input",
-//                 message: "How many would you like to buy?"
-//             },
-//         ]).then(function(answers) {
-//             //check that the item is in stock
-//             console.log(answers.product_id);
-//         });
-//     });
-// }
-
-// function validateNumber(num)
-// {
-//    var isValid = !_.isNaN(parseFloat(num));
-//    return isValid || "this should be a number!";
-// }
-
-

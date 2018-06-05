@@ -1,5 +1,6 @@
 var mysql = require("mysql");
-var inquirer = require("inquirer");
+var inquirer = require("inquirer");  
+
 
 // create the connection information for the sql database
 var connection = mysql.createConnection({
@@ -87,14 +88,9 @@ function promptBuyer() {
                     function(err) {
                         if(err) throw err;
 
-                        //show the user the $ of their order
-                        
-                        console.log("order placed!");
-                        // connection.end();
-                        // console.log(chosenID);
+                        console.log("order placed!");                        
                         showPrice(chosenID, answers.quantity);
                         checkSales();
-                                  
                         }
                     )
                 }
@@ -130,3 +126,5 @@ function checkSales() {
         }
     });
 }
+
+

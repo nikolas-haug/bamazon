@@ -52,20 +52,8 @@ function promptBuyer() {
                 message: "Please tell me the product id",
                 type: "input",
                 //validate that input is a number
-
                 validate: function(value) {
-                    // console.log(value, typeof value, parseInt(value));
-                    // if (isNaN(value) === false) {
-                    //   return true;
-                    // }
-                    // return false;
-                    // console.log("please enter a valid number")
                     return /^[0-9]+$/.test(value);
-
-                    // var matches = /^[0-9]+$/.test(value);
-
-                    // if ( ! matches) console.log("\nplease enter again");
-                    // return ! isNaN(parseInt(value));
                 }
             },
             {
@@ -103,33 +91,23 @@ function promptBuyer() {
                         
                         console.log("order placed!");
                         // connection.end();
-                        connection.query("SELECT price FROM products WHERE item_id= ?", 
-                    [chosenID]
-                ),
-                        function(err, res) {
-                            if(err) throw err;
-                            console.log(res.price);
-                            console.log(chosenID);
+                        // console.log(chosenID);
+                        showPrice(chosenID, answers.quantity);
+                                  
                         }
-                    }                   
-                )   
+                    )
                 }
                 
-                // console.log(answers.quantity);
-                // console.log(res[0].stock_quantity);
-                // console.log(chosenID);
             });
         });
     });
 }
 
-// function showPrice(prod) {
-//     connection.query("SELECT price FROM products WHERE item_id= ?",
-//         [prod],
-//      function(err) {
-//         if(err) throw err;
-//         console.log("order total: " + prod);
-//     });
-// }
-
-// showPrice(4);
+function showPrice(prod, quant) {
+    connection.query("SELECT price FROM products WHERE item_id= ?",
+        [prod],
+     function(err, res) {
+        if(err) throw err;
+        console.log("order total: $" + (res[0].price * quant).toFixed(2));
+    });
+}

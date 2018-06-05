@@ -93,6 +93,7 @@ function promptBuyer() {
                         // connection.end();
                         // console.log(chosenID);
                         showPrice(chosenID, answers.quantity);
+                        checkSales();
                                   
                         }
                     )
@@ -109,5 +110,23 @@ function showPrice(prod, quant) {
      function(err, res) {
         if(err) throw err;
         console.log("order total: $" + (res[0].price * quant).toFixed(2));
+    });
+}
+
+function checkSales() {
+    inquirer.prompt([
+        {
+            name: "verify",
+            message: "would you like to make another sale?",
+            type: "confirm"
+        }
+    ]).then(function(answers) {
+        if(answers.verify === true) {
+            console.log("welcome back to the bamazon marketplace");
+            showProducts();
+        } else {
+            console.log("thank you for shopping here");
+            connection.end();
+        }
     });
 }

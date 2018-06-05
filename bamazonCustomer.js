@@ -1,5 +1,7 @@
 var mysql = require("mysql");
-var inquirer = require("inquirer");  
+var inquirer = require("inquirer");
+//prettify the console output
+var Table = require('cli-table');
 
 
 // create the connection information for the sql database
@@ -30,14 +32,32 @@ connection.connect(function(err) {
 function showProducts() {
     connection.query("SELECT * FROM products", function(err, results) {
         if(err) throw err;
+
+        // instantiate
+        var table = new Table({
+            head: ["Product", "ID", "Department", "Price $ ", "Quantity"],
+            colWidths: [40, 10, 20, 10, 10]
+        });
+
         console.log("\n");
         //loop through all available products - TO DO: check availability is not 0 for each product
         for(var i = 0; i < results.length; i++) {
             //check for product availability
             if(results[i].stock_quantity > 0) {
-                console.log(`Product ID: ${results[i].item_id} - ${results[i].product_name} || Price: $${results[i].price.toFixed(2)}\n`);
+                
+                table.push([
+                    results[i].product_name,
+                    results[i].item_id,
+                    results[i].department_name,
+                    results[i].price.toFixed(2),
+                    results[i].stock_quantity
+                ]);
+
+                // console.log(`Product ID: ${results[i].item_id} - ${results[i].product_name} || Price: $${results[i].price.toFixed(2)}\n`);
             }
         }
+        console.log("===== Welcom to Bamazon! =====");
+        console.log(table.toString());
         promptBuyer();
     });
 }
@@ -105,7 +125,18 @@ function showPrice(prod, quant) {
         [prod],
      function(err, res) {
         if(err) throw err;
-        console.log("order total: $" + (res[0].price * quant).toFixed(2));
+        var table = new Table({
+            head: ["Your order: ", "$ Total $"],
+            colWidths: [40, 40]
+        });
+        table.push([
+            "col-1",
+            res[0].price.toFixed(2)
+        ]);
+        
+        console.log("\n");
+        console.log(table.toString());
+        // console.log("order total: $" + (res[0].price * quant).toFixed(2));
     });
 }
 
@@ -126,5 +157,3 @@ function checkSales() {
         }
     });
 }
-
-

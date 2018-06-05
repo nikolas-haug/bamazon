@@ -98,5 +98,6 @@ connection.connect(function(err) {
             }
         }
         console.log(table.toString());
+        
     });   
   }

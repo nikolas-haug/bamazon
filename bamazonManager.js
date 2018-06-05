@@ -1,7 +1,6 @@
 var mysql = require("mysql");
 var inquirer = require("inquirer"); 
-
-var cTable = require("console.table");
+//prettify the console output
 var Table = require('cli-table');
 
 
@@ -66,7 +65,7 @@ connection.connect(function(err) {
         if(err) throw err;
         // instantiate
         var table = new Table({
-            head: ["Product", "ID", "Department", "Price", "Quantity"],
+            head: ["Product", "ID", "Department", "Price $ ", "Quantity"],
             colWidths: [40, 10, 20, 10, 10]
         });
         for(var i = 0; i < res.length; i++) {
@@ -77,5 +76,27 @@ connection.connect(function(err) {
             );
         }
         console.log(table.toString());
+        displayMenu();
       });
+  }
+
+  function inspectInventory() {
+      //check for low inventory items
+      connection.query("SELECT * FROM products", function(err, res) {
+        if(err) throw err;
+        // instantiate
+        var table = new Table({
+            head: ["Product", "Low quantity"],
+            colWidths: [40, 40]
+        });
+        for(var i = 0; i < res.length; i++) {
+            if(res[i].stock_quantity < 5) {
+                table.push([
+                    res[i].product_name,
+                    res[i].stock_quantity
+                ]);
+            }
+        }
+        console.log(table.toString());
+    });   
   }

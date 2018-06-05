@@ -1,5 +1,8 @@
 var mysql = require("mysql");
-var inquirer = require("inquirer");  
+var inquirer = require("inquirer"); 
+
+var cTable = require("console.table");
+var Table = require('cli-table');
 
 
 // create the connection information for the sql database
@@ -55,5 +58,24 @@ connection.connect(function(err) {
         if(answers.options === "Add new product") {
             addProduct();
         }
+      });
+  }
+
+  function viewProducts() {
+      connection.query("SELECT * FROM products", function(err, res) {
+        if(err) throw err;
+        // instantiate
+        var table = new Table({
+            head: ["Product", "ID", "Department", "Price", "Quantity"],
+            colWidths: [40, 10, 20, 10, 10]
+        });
+        for(var i = 0; i < res.length; i++) {
+ 
+            // table is an Array, so you can `push`, `unshift`, `splice` and friends
+            table.push(
+                [res[i].product_name, res[i].item_id, res[i].department_name, res[i].price.toFixed(2), res[i].stock_quantity]
+            );
+        }
+        console.log(table.toString());
       });
   }

@@ -52,12 +52,20 @@ function promptBuyer() {
                 message: "Please tell me the product id",
                 type: "input",
                 //validate that input is a number
+
                 validate: function(value) {
-                    if (isNaN(value) === false) {
-                      return true;
-                    }
-                    return false;
-                    console.log("please enter a valid number")
+                    // console.log(value, typeof value, parseInt(value));
+                    // if (isNaN(value) === false) {
+                    //   return true;
+                    // }
+                    // return false;
+                    // console.log("please enter a valid number")
+                    return /^[0-9]+$/.test(value);
+
+                    // var matches = /^[0-9]+$/.test(value);
+
+                    // if ( ! matches) console.log("\nplease enter again");
+                    // return ! isNaN(parseInt(value));
                 }
             },
             {
@@ -82,7 +90,7 @@ function promptBuyer() {
                     console.log("The current item stock is: " + res[0].stock_quantity);
                     promptBuyer();
                 } else {
-                    // console.log("your order has been placed");
+                    
                     connection.query("UPDATE products SET stock_quantity = ? WHERE item_id= ?",
                     [
                         res[0].stock_quantity - answers.quantity,
@@ -90,11 +98,23 @@ function promptBuyer() {
                     ],
                     function(err) {
                         if(err) throw err;
+
+                        //show the user the $ of their order
+                        
                         console.log("order placed!");
-                        connection.end();
+                        // connection.end();
+                        connection.query("SELECT price FROM products WHERE item_id= ?", 
+                    [chosenID]
+                ),
+                        function(err, res) {
+                            if(err) throw err;
+                            console.log(res.price);
+                            console.log(chosenID);
+                        }
                     }                   
                 )   
                 }
+                
                 // console.log(answers.quantity);
                 // console.log(res[0].stock_quantity);
                 // console.log(chosenID);
@@ -102,3 +122,14 @@ function promptBuyer() {
         });
     });
 }
+
+// function showPrice(prod) {
+//     connection.query("SELECT price FROM products WHERE item_id= ?",
+//         [prod],
+//      function(err) {
+//         if(err) throw err;
+//         console.log("order total: " + prod);
+//     });
+// }
+
+// showPrice(4);

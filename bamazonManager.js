@@ -3,7 +3,6 @@ var inquirer = require("inquirer");
 //prettify the console output
 var Table = require('cli-table');
 
-
 // create the connection information for the sql database
 var connection = mysql.createConnection({
   host: "localhost",
@@ -41,7 +40,10 @@ connection.connect(function(err) {
                 new inquirer.Separator(),
                 "Add to inventory",
                 new inquirer.Separator(),
-                "Add new product"
+                "Add new product",
+                new inquirer.Separator(),
+                "* * Exit * *",
+                new inquirer.Separator()
             ]
           },
       ]).then(function(answers) {
@@ -56,6 +58,9 @@ connection.connect(function(err) {
         }
         if(answers.options === "Add new product") {
             addProduct();
+        }
+        if(answers.options === "* * Exit * *") {
+            exitApp();
         }
       });
   }
@@ -130,6 +135,7 @@ connection.connect(function(err) {
             },
         ]).then(function(answers) {
             updateStock(answers.product, answers.quantity);
+            displayMenu();
         });
       });   
   }
@@ -145,10 +151,49 @@ function updateStock(item, addQuant) {
         ],
             function(err) {
                 if(err) throw err;
-                console.log(res[0].stock_quantity);
-                console.log(item);
-                console.log(addQuant);
             });
         }
     )
+}
+
+function addProduct() {
+    inquirer.prompt([
+        {
+            name: "productName",
+            type: "input",
+            message: "Product name:"
+        },
+        {
+            name: "department",
+            type: "input",
+            message: "Department:"
+        },
+        {
+            name: "price",
+            type: "input",
+            message: "Price:"
+        },
+        {
+            name: "quantity",
+            type: "input",
+            message: "Quantity:"
+        },
+    ]).then(function(answers) {
+        var addedProduct = {
+            product_name: answers.productName,
+            department_name: answers.department,
+            price: answers.price,
+            stock_quantity: answers.quantity
+        }
+        connection.query("INSERT INTO products SET ?", addedProduct, function(err) {
+            if(err) throw err;
+            console.log("product added!");
+            displayMenu();
+        });
+    });
+}
+
+function exitApp() {
+    console.log("===== logout successful! ====");
+    connection.end();
 }

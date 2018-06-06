@@ -33,6 +33,7 @@ connection.connect(function(err) {
             name: "options",
             type: "list",
             message: "-- WELCOME BACK MANAGER --",
+            pageSize: 10,
             choices: [
                 "View products for sale",
                 new inquirer.Separator(),

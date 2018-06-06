@@ -98,6 +98,57 @@ connection.connect(function(err) {
             }
         }
         console.log(table.toString());
-        
+        displayMenu();
     });   
   }
+
+  function addInventory() {
+      connection.query("SELECT * FROM products", function(err, res) {
+            if(err) throw err;
+        inquirer.prompt([
+            {
+              name: "product",
+              type: "list",
+              message: "what product do you want to add to?",
+              choices: function() {
+                var choiceArray = [];
+                for (var i = 0; i < res.length; i++) {
+                  choiceArray.push(res[i].product_name);
+                }
+                return choiceArray;
+              }
+            },
+            {
+                name: "quantity",
+                type: "input",
+                //validate that input is a number
+                validate: function(value) {
+                    return /^[0-9]+$/.test(value);
+                },
+                message: "how many do you want to add?"
+
+            },
+        ]).then(function(answers) {
+            updateStock(answers.product, answers.quantity);
+        });
+      });   
+  }
+
+function updateStock(item, addQuant) {
+    connection.query("SELECT stock_quantity FROM products WHERE product_name = ?",
+    [item],
+    function(err, res) {
+        if(err) throw err;
+        connection.query("UPDATE products SET stock_quantity = ? WHERE product_name = ?",
+        [
+            res[0].stock_quantity + parseInt(addQuant), item
+        ],
+            function(err) {
+                if(err) throw err;
+                console.log(res[0].stock_quantity);
+                console.log(item);
+                console.log(addQuant);
+            });
+        }
+    )
+}

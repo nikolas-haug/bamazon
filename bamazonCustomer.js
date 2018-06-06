@@ -74,6 +74,7 @@ function promptBuyer() {
                 type: "input",
                 //validate that input is a number
                 validate: function(value) {
+                
                     return /^[0-9]+$/.test(value);
                 }
             },
@@ -121,22 +122,21 @@ function promptBuyer() {
 }
 
 function showPrice(prod, quant) {
-    connection.query("SELECT price FROM products WHERE item_id= ?",
+    connection.query("SELECT product_name, price FROM products WHERE item_id= ?",
         [prod],
      function(err, res) {
         if(err) throw err;
         var table = new Table({
-            head: ["Your order: ", "$ Total $"],
-            colWidths: [40, 40]
+            head: ["Your order: ", "Quantity", "$ Total $"],
+            colWidths: [40, 10, 40]
         });
         table.push([
-            "col-1",
-            res[0].price.toFixed(2)
+            res[0].product_name,
+            quant,
+            (res[0].price * quant).toFixed(2)
         ]);
-        
         console.log("\n");
         console.log(table.toString());
-        // console.log("order total: $" + (res[0].price * quant).toFixed(2));
     });
 }
 

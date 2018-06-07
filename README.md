@@ -26,4 +26,22 @@ The Manager view allows an admin to view and update the products in the database
 
 ### bamazonCustomer.js
 
+The user is prompted with a cli-table of the available products and their prices, quantities, and department names.
+
 ![customer image 1](images/bamazoncustomer1.png)
+
+They are asked to enter a valid product ID and a desired quantity.
+
+![customer image 2](images/bamazoncustomer2.png)
+
+The order is placed and they are shown a receipt of their purchase.
+
+![customer image 3](images/bamazoncustomer3.png)
+
+The stock quantity of the chosen product is updated in the database.
+
+![customer image 4](images/bamazoncustomer4.png)
+
+The user is then prompted if they would like another sale. If yes, the products table is displayed again. If no, they exit the application.
+
+![customer image 5](images/bamazoncustomer5.png)

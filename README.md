@@ -26,5 +26,4 @@ The Manager view allows an admin to view and update the products in the database
 
 ### bamazonCustomer.js
 
-![customer image 1]
-(images/bamazoncustomer1.png)
+![customer image 1](images/bamazoncustomer1.png)

@@ -3,7 +3,6 @@ var inquirer = require("inquirer");
 //prettify the console output
 var Table = require('cli-table');
 
-
 // create the connection information for the sql database
 var connection = mysql.createConnection({
   host: "localhost",
@@ -25,7 +24,6 @@ connection.connect(function(err) {
     if (err) throw err;
     // console.log("connected!");
     showProducts();
-    // promptBuyer();
   });
 
 // show all items in products table
@@ -40,11 +38,11 @@ function showProducts() {
         });
 
         console.log("\n");
-        //loop through all available products - TO DO: check availability is not 0 for each product
+        //loop through all available products
         for(var i = 0; i < results.length; i++) {
             //check for product availability
             if(results[i].stock_quantity > 0) {
-                
+                //push available products into cli-table object
                 table.push([
                     results[i].product_name,
                     results[i].item_id,
@@ -52,8 +50,6 @@ function showProducts() {
                     results[i].price.toFixed(2),
                     results[i].stock_quantity
                 ]);
-
-                // console.log(`Product ID: ${results[i].item_id} - ${results[i].product_name} || Price: $${results[i].price.toFixed(2)}\n`);
             }
         }
         console.log("===== Welcom to Bamazon! =====");
@@ -72,11 +68,17 @@ function promptBuyer() {
                 name: "product_id",
                 message: "Please tell me the product id",
                 type: "input",
-                //validate that input is a number
-                validate: function(value) {
-                
-                    return /^[0-9]+$/.test(value);
+                //validate that the input is a number and a valid product ID
+                validate: function(value){
+                    if(isNaN(value) == false && parseInt(value) <= results.length && parseInt(value) > 0){
+                        return true;
+                    } else{
+                        console.log(" * * Please enter a valid ID * *");
+                        return false;
+                    }
                 }
+                //initial regEx input validation
+                // return /^[0-9]+$/.test(value);
             },
             {
                 name: "quantity",
@@ -90,6 +92,7 @@ function promptBuyer() {
                     chosenID = results[i].item_id;
                 }
             }
+            
             connection.query("SELECT stock_quantity FROM products WHERE item_id= ?", 
             [chosenID],
             function(err, res) {
@@ -121,6 +124,7 @@ function promptBuyer() {
     });
 }
 
+//display the total price of the sale
 function showPrice(prod, quant) {
     connection.query("SELECT product_name, price FROM products WHERE item_id= ?",
         [prod],
@@ -140,6 +144,7 @@ function showPrice(prod, quant) {
     });
 }
 
+//ask the user if they would like another sale or exit the application
 function checkSales() {
     inquirer.prompt([
         {
